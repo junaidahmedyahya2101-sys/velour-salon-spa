@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velour Beauty & Spa | Where Luxury Becomes Ritual</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Jost:wght@100;200;300;400&display=swap" rel="stylesheet">
+  
+  <!-- GSAP CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    /* --- DESIGN SYSTEM & CSS VARIABLES --- */
+    :root {
+      --bg-dark: #0B0B0B;
+      --bg-card: #121212;
+      --rose-gold: #D4AF37; /* Warm luxury amber/gold tint */
+      --rose-gold-glow: rgba(212, 175, 55, 0.2);
+      --text-cream: #F5F2EB;
+      --text-muted: #A9A59C;
+      --font-serif: 'Cormorant Garamond', serif;
+      --font-sans: 'Jost', sans-serif;
+      --transition-deliberate: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-dark);
+      color: var(--text-cream);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+    }
+
+    body {
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* --- CINEMATIC FILM GRAIN OVERLAY --- */
+    .film-grain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.04; /* Ultra-subtle texture */
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* --- TYPOGRAPHY UTILITIES --- */
+    h1, h2, h3, .brand-logo {
+      font-family: var(--font-serif);
+      font-weight: 300;
+      letter-spacing: 0.2em;
+    }
+
+    p {
+      font-weight: 200;
+      line-height: 1.8;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* --- STICKY FROSTED NAVBAR --- */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 30px 50px;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition-deliberate);
+      background: transparent;
+    }
+
+    header.scrolled {
+      padding: 20px 50px;
+      background: rgba(11, 11, 11, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+
+    .brand-logo {
+      font-size: 1.5rem;
+      color: var(--text-cream);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    nav {
+      display: flex;
+      gap: 40px;
+    }
+
+    .nav-link {
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-cream);
+      text-decoration: none;
+      position: relative;
+      padding: 5px 0;
+      display: inline-block;
+    }
+
+    /* --- HERO SECTION --- */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #161616 0%, #0B0B0B 100%);
+    }
+
+    /* Ambient Particle Canvas */
+    #particle-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    .hero-title-container {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: 6.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      margin-right: -0.4em; /* Offset trailing letter-spacing */
+      opacity: 0;
+    }
+
+    .hero .subtitle {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.8rem;
+      color: var(--rose-gold);
+      margin-top: 10px;
+      opacity: 0;
+    }
+
+    .hero-underline {
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--rose-gold), transparent);
+      margin: 20px auto 0 auto;
+    }
+
+    /* --- MORPHING LIQUID SERUM CTA BUTTON --- */
+    .cta-button {
+      margin-top: 40px;
+      padding: 18px 45px;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--text-cream);
+      background: transparent;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 30px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition-deliberate);
+      z-index: 10;
+    }
+
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, var(--rose-gold-glow) 0%, transparent 70%);
+      border-radius: 43% 57% 65% 35% / 57% 45% 55% 43%;
+      transition: transform 1.5s ease-in-out;
+      transform: scale(0);
+      z-index: -1;
+    }
+
+    .cta-button:hover {
+      border-color: var(--rose-gold);
+      box-shadow: 0 0 25px var(--rose-gold-glow);
+    }
+
+    .cta-button:hover::before {
+      transform: scale(1) rotate(180deg);
+      border-radius: 50% 40% 60% 45% / 40% 60% 45% 55%;
+    }
+
+    /* --- SECTION ARCHITECTURE --- */
+    section {
+      padding: 140px 10%;
+      position: relative;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 80px;
+    }
+
+    .section-header h2 {
+      font-size: 2.8rem;
+      text-transform: uppercase;
+      margin-bottom: 15px;
+    }
+
+    .reveal-element {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    /* --- SERVICES SECTION (3D TILT CARDS) --- */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 40px;
+      perspective: 1000px; /* Crucial for 3D depth */
+    }
+
+    .service-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      padding: 50px 40px;
+      border-radius: 4px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: border 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    .service-card:hover {
+      border-color: rgba(212, 175, 55, 0.2);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .service-card h3 {
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+      transform: translateZ(30px); /* Pushes layer outward */
+    }
+
+    .service-card p {
+      transform: translateZ(15px);
+    }
+
+    .service-price {
+      margin-top: 30px;
+      font-family: var(--font-sans);
+      font-weight: 300;
+      color: var(--rose-gold);
+      letter-spacing: 0.1em;
+      transform: translateZ(25px);
+    }
+
+    /* --- STATS SECTION (GSAP COUNTER) --- */
+    .stats-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 40px;
+      background: linear-gradient(180deg, transparent, var(--bg-card), transparent);
+      padding: 80px 0;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: var(--font-serif);
+      font-size: 4rem;
+      color: var(--rose-gold);
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .stat-label {
+      font-family: var(--font-sans);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--text-muted);
+    }
+
+    /* --- GALLERY (CURTAIN WIPE REVEAL) --- */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 3 / 4;
+      background: #151515;
+    }
+
+    /* Dummy structural images using premium gradient patterns to mimic macro backlighting */
+    .gallery-img-placeholder {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      filter: grayscale(40%) contrast(110%);
+      transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .gallery-item:nth-child(1) .gallery-img-placeholder { background-image: linear-gradient(to bottom right, #2c2519, #0b0b0b); }
+    .gallery-item:nth-child(2) .gallery-img-placeholder { background-image: linear-gradient(to bottom right, #1a2228, #0b0b0b); }
+    .gallery-item:nth-child(3) .gallery-img-placeholder { background-image: linear-gradient(to bottom right, #261b24, #0b0b0b); }
+
+    .gallery-item:hover .gallery-img-placeholder {
+      transform: scale(1.05);
+    }
+
+    /* Curtain Wipe Layer */
+    .curtain {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-dark);
+      z-index: 2;
+      transform-origin: right;
+    }
+
+    /* --- TEAM & PREMIUM FLIP CARDS --- */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 40px;
+      margin-bottom: 100px;
+    }
+
+    .flip-card {
+      background: transparent;
+      perspective: 1000px;
+      height: 400px;
+    }
+
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .flip-card:hover .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .flip-card-front {
+      background: linear-gradient(135deg, #222, #111);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .flip-card-front h4 {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 5px;
+    }
+
+    .flip-card-front span {
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--rose-gold);
+      letter-spacing: 0.15em;
+    }
+
+    .flip-card-back {
+      background: var(--bg-card);
+      color: var(--text-cream);
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    /* --- TESTIMONIAL PANNER --- */
+    .testimonial-wrapper {
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      padding: 40px 0;
+    }
+
+    .testimonial-track {
+      display: flex;
+      gap: 60px;
+      width: max-content;
+    }
+
+    .testimonial-item {
+      width: 450px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.01);
+      padding: 40px;
+      border-left: 1px solid var(--rose-gold);
+    }
+
+    .testimonial-text {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.3rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .testimonial-author {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--rose-gold);
+    }
+
+    /* --- CONTACT FORM --- */
+    .contact-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .luxury-form {
+      display: flex;
+      flex-direction: column;
+      gap: 35px;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    .luxury-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px 0;
+      color: var(--text-cream);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      transition: var(--transition-deliberate);
+    }
+
+    .luxury-input:focus {
+      outline: none;
+      border-bottom-color: var(--rose-gold);
+    }
+
+    .form-group label {
+      position: absolute;
+      left: 0;
+      top: 12px;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 200;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: var(--transition-deliberate);
+    }
+
+    .luxury-input:focus ~ label,
+    .luxury-input:not(:placeholder-shown) ~ label {
+      top: -15px;
+      font-size: 0.7rem;
+      color: var(--rose-gold);
+    }
+
+    /* --- FOOTER & ELASTIC SOCIALS --- */
+    footer {
+      background: #060606;
+      padding: 100px 10% 50px 10%;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.02);
+    }
+
+    .footer-logo {
+      font-size: 4rem;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: inline-block;
+    }
+
+    .footer-tagline {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--text-muted);
+      margin-bottom: 50px;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 50px;
+    }
+
+    .social-icon {
+      color: var(--text-cream);
+      text-decoration: none;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 10px;
+      position: relative;
+    }
+
+    .copyright {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* --- RESPONSIVE OPTIMIZATIONS --- */
+    @media (max-width: 768px) {
+      header { padding: 20px; }
+      .hero h1 { font-size: 3.5rem; }
+      section { padding: 80px 5%; }
+      nav { display: none; } /* Kept clean for single-page cinematic focus */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="film-grain"></div>
+
+  <!-- HEADER -->
+  <header id="navbar">
+    <a href="#" class="brand-logo">Velour</a>
+    <nav>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#gallery" class="nav-link">Gallery</a>
+      <a href="#team" class="nav-link">The Team</a>
+      <a href="#contact" class="nav-link">Rituals</a>
+    </nav>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <canvas id="particle-canvas"></canvas>
+    <div class="hero-title-container">
+      <h1 id="hero-logo">Velour</h1>
+      <div class="subtitle" id="hero-subtitle">Beauty & Spa</div>
+      <div class="hero-underline" id="hero-line"></div>
+    </div>
+    <button class="cta-button">Initiate Ritual</button>
+  </section>
+
+  <!-- SERVICES SECTION -->
+  <section id="services">
+    <div class="section-header reveal-element">
+      <h2>Curated Rituals</h2>
+      <p>Transformative physical therapies rooted in classical European methodologies.</p>
+    </div>
+    
+    <div class="services-grid">
+      <div class="service-card reveal-element">
+        <h3>Amber Serum Infusion</h3>
+        <p>A deep cellular hydration process using micro-activated amber concentrates to restore natural epidermal luminescence.</p>
+        <div class="service-price">75 Minutes — $240</div>
+      </div>
+      
+      <div class="service-card reveal-element">
+        <h3>Botanical Sculpting</h3>
+        <p>An advanced contouring structural massage targeting facial architecture to lift, release tension, and drainage toxins.</p>
+        <div class="service-price">60 Minutes — $195</div>
+      </div>
+      
+      <div class="service-card reveal-element">
+        <h3>Anamorphic Hydro-Bath</h3>
+        <p>Submergence therapy combining customized thermal mineral waters with structural acoustic sound waves for absolute state-shift.</p>
+        <div class="service-price">90 Minutes — $310</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS SECTION -->
+  <section id="stats">
+    <div class="stats-container">
+      <div class="stat-item">
+        <span class="stat-number" data-target="1200">0</span>
+        <span class="stat-label">Clients Served</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="14">0</span>
+        <span class="stat-label">Years of Rituals</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="100">0</span>
+        <span class="stat-label">% Parisian Heritage</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY SECTION -->
+  <section id="gallery">
+    <div class="section-header reveal-element">
+      <h2>Visual Space</h2>
+      <p>A glimpse into the physical poetry and backlit textures of our sanctuary.</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item reveal-element">
+        <div class="curtain"></div>
+        <div class="gallery-img-placeholder"></div>
+      </div>
+      <div class="gallery-item reveal-element">
+        <div class="curtain"></div>
+        <div class="gallery-img-placeholder"></div>
+      </div>
+      <div class="gallery-item reveal-element">
+        <div class="curtain"></div>
+        <div class="gallery-img-placeholder"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM & TESTIMONIALS SECTION -->
+  <section id="team">
+    <div class="section-header reveal-element">
+      <h2>The Artisans</h2>
+      <p>Master practitioners dedicated to the precision of anatomical care.</p>
+    </div>
+    
+    <div class="team-grid">
+      <!-- Artisan 1 -->
+      <div class="flip-card reveal-element">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <h4>Elena Rostova</h4>
+            <span>Dermal Artistry</span>
+          </div>
+          <div class="flip-card-back">
+            <p>Fourteen years studying epidermal behavior in Paris. Specialized in high-performance structural facial architecture.</p>
+          </div>
+        </div>
+      </div>
+      <!-- Artisan 2 -->
+      <div class="flip-card reveal-element">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <h4>Marcus Vance</h4>
+            <span>Hydrotherapy Specialist</span>
+          </div>
+          <div class="flip-card-back">
+            <p>Combines ancient thalassotherapy principles with modern neurological sound staging for deep sensory resets.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Testimonial Panoramic Panner -->
+    <div class="testimonial-wrapper">
+      <div class="testimonial-track">
+        <div class="testimonial-item">
+          <div class="testimonial-text">"The Amber Infusion altered not just my skin, but my entire pacing. It feels heavy, intentional, and perfectly quiet."</div>
+          <div class="testimonial-author">Baroness V. de Rothschild</div>
+        </div>
+        <div class="testimonial-item">
+          <div class="testimonial-text">"Velour treats aesthetics like architectural conservation. An unparalleled restorative environment."</div>
+          <div class="testimonial-author">Julianne M.</div>
+        </div>
+        <div class="testimonial-item">
+          <div class="testimonial-text">"The 3-D sculpting massage releases tension I didn't realize I held for years. Pure, slow luxury."</div>
+          <div class="testimonial-author">Symphony Director H. K.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT SECTION -->
+  <section id="contact">
+    <div class="section-header reveal-element">
+      <h2>Request Sanctuary</h2>
+      <p>Reservations are manually vetted and balanced to protect the acoustic calm of our space.</p>
+    </div>
+    <div class="contact-container reveal-element">
+      <form class="luxury-form" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <input type="text" id="name" class="luxury-input" placeholder=" " required>
+          <label for="name">Your Name</label>
+        </div>
+        <div class="form-group">
+          <input type="email" id="email" class="luxury-input" placeholder=" " required>
+          <label for="email">Digital Address</label>
+        </div>
+        <div class="form-group">
+          <input type="text" id="ritual" class="luxury-input" placeholder=" " required>
+          <label for="ritual">Desired Therapy Ritual</label>
+        </div>
+        <button type="submit" class="cta-button" style="align-self: flex-start; margin-top: 20px;">Submit Request</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo" id="footer-logo-track">Velour</div>
+    <div class="footer-tagline">Where luxury becomes ritual.</div>
+    
+    <div class="social-links">
+      <a href="#" class="social-icon">Instagram</a>
+      <a href="#" class="social-icon">Journal</a>
+      <a href="#" class="social-icon">Vimeo</a>
+    </div>
+    <div class="copyright">&copy; 2026 Velour. Crafted for the intentional service space.</div>
+  </footer>
+
+  <!-- ADVANCED ENGINE IMPLEMENTATION -->
+  <script>
+    // Register ScrollTrigger Extension
+    gsap.registerPlugin(ScrollTrigger);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initNavbarScroll();
+      initHeroTimeline();
+      initMagneticNav();
+      initCardTilt();
+      initScrollReveals();
+      initStatCounters();
+      initGalleryCurtains();
+      initTestimonialPan();
+      initElasticSocials();
+      initParticleAtmosphere();
+    });
+
+    /* 1. NAVBAR DYNAMICS */
+    function initNavbarScroll() {
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      });
+    }
+
+    /* 2. HERO TIMELINE (Cinematic 24fps Framing) */
+    function initHeroTimeline() {
+      const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+      
+      // Break text up dynamically into characters for split letter timing
+      const logo = document.getElementById('hero-logo');
+      const text = logo.textContent;
+      logo.textContent = '';
+      logo.style.opacity = 1;
+      
+      text.split('').forEach(char => {
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.style.display = 'inline-block';
+        span.style.opacity = 0;
+        span.style.transform = 'scale(0.9) translateY(10px)';
+        logo.appendChild(span);
+      });
+
+      tl.to('#hero-logo span', {
+        opacity: 1,
+        transform: 'scale(1) translateY(0)',
+        stagger: 0.15,
+        duration: 1.4
+      })
+      .to('#hero-subtitle', {
+        opacity: 1,
+        y: 0,
+        duration: 1.2
+      }, "-=0.8")
+      .to('#hero-line', {
+        width: '100%',
+        duration: 2,
+        ease: "power2.inOut"
+      }, "-=1.2");
+      
+      // Subtle constant Parallax on Hero elements during viewport scroll
+      gsap.to('.hero-title-container', {
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        },
+        y: 120,
+        opacity: 0.3
+      });
+    }
+
+    /* 3. MAGNETIC NAVIGATION LINKS */
+    function initMagneticNav() {
+      const links = document.querySelectorAll('.nav-link');
+      links.forEach(link => {
+        link.addEventListener('mousemove', (e) => {
+          const rect = link.getBoundingClientRect();
+          const x = e.clientX - rect.left - (rect.width / 2);
+          const y = e.clientY - rect.top - (rect.height / 2);
+          // Attract toward cursor position slightly
+          gsap.to(link, { x: x * 0.4, y: y * 0.4, duration: 0.3, ease: "power2.out" });
+        });
+        link.addEventListener('mouseleave', () => {
+          gsap.to(link, { x: 0, y: 0, duration: 0.5, ease: "elastic.out(1, 0.3)" });
+        });
+      });
+    }
+
+    /* 4. 3D CARD TILT MECHANISM */
+    function initCardTilt() {
+      const cards = document.querySelectorAll('.service-card');
+      cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          
+          // Calculate Normalized Coordinates (-0.5 to 0.5)
+          const xc = (x / rect.width) - 0.5;
+          const yc = (y / rect.height) - 0.5;
+          
+          // Rotate inverse mapping to naturally face source focus
+          gsap.to(card, {
+            rotationY: xc * 12,
+            rotationX: -yc * 12,
+            ease: "power2.out",
+            duration: 0.4
+          });
+        });
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, {
+            rotationY: 0,
+            rotationX: 0,
+            ease: "power2.out",
+            duration: 0.6
+          });
+        });
+      });
+    }
+
+    /* 5. INTERSECTION OBSERVER SCROLL REVEALS */
+    function initScrollReveals() {
+      const targets = document.querySelectorAll('.reveal-element');
+      const observerOptions = {
+        root: null,
+        threshold: 0.1,
+        rootMargin: "0px 0px -40px 0px"
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            gsap.to(entry.target, {
+              opacity: 1,
+              y: 0,
+              duration: 1.2,
+              ease: "power3.out"
+            });
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      targets.forEach(el => observer.observe(el));
+    }
+
+    /* 6. COUNTERS & PULSE */
+    function initStatCounters() {
+      const numbers = document.querySelectorAll('.stat-number');
+      numbers.forEach(num => {
+        const target = parseInt(num.getAttribute('data-target'), 10);
+        
+        ScrollTrigger.create({
+          trigger: num,
+          start: "top 85%",
+          onEnter: () => {
+            let countObj = { val: 0 };
+            gsap.to(countObj, {
+              val: target,
+              duration: 2.5,
+              ease: "power3.out",
+              onUpdate: function() {
+                num.textContent = Math.floor(countObj.val).toLocaleString() + (target === 100 ? '%' : '+');
+              },
+              onComplete: function() {
+                // Subtle macro visual pulse on value completion
+                gsap.timeline()
+                  .to(num, { scale: 1.1, color: '#F5F2EB', duration: 0.2 })
+                  .to(num, { scale: 1, color: '#D4AF37', duration: 0.4 });
+              }
+            });
+          }
+        });
+      });
+    }
+
+    /* 7. GALLERY MASONRY CURTAIN REVEAL */
+    function initGalleryCurtains() {
+      const items = document.querySelectorAll('.gallery-item');
+      items.forEach(item => {
+        const curtain = item.querySelector('.curtain');
+        ScrollTrigger.create({
+          trigger: item,
+          start: "top 80%",
+          onEnter: () => {
+            gsap.to(curtain, {
+              scaleX: 0,
+              duration: 1.4,
+              ease: "power3.inOut"
+            });
+          }
+        });
+      });
+    }
+
+    /* 8. TESTIMONIAL PANNER (Continuous Slow Horizontal Track) */
+    function initTestimonialPan() {
+      const track = document.querySelector('.testimonial-track');
+      // Clone cards to implement an infinite cinematic track loop
+      const clones = track.innerHTML;
+      track.innerHTML += clones;
+
+      gsap.to(track, {
+        x: () => -(track.scrollWidth / 2),
+        duration: 35,
+        ease: "none",
+        repeat: -1
+      });
+    }
+
+    /* 9. ELASTIC SOCIAL LINKS WITH AMBER GLOW */
+    function initElasticSocials() {
+      const icons = document.querySelectorAll('.social-icon');
+      icons.forEach(icon => {
+        icon.addEventListener('mouseenter', () => {
+          gsap.to(icon, {
+            scale: 1.15,
+            color: '#D4AF37',
+            textShadow: "0 0 12px rgba(212, 175, 55, 0.6)",
+            duration: 0.4,
+            ease: "elastic.out(1, 0.3)"
+          });
+        });
+        icon.addEventListener('mouseleave', () => {
+          gsap.to(icon, {
+            scale: 1,
+            color: '#F5F2EB',
+            textShadow: "none",
+            duration: 0.4,
+            ease: "power2.out"
+          });
+        });
+      });
+
+      // Track configuration on footer scroll matching tracking compression concept
+      gsap.fromTo('#footer-logo-track', 
+        { letterSpacing: '0.1em' },
+        {
+          letterSpacing: '0.4em',
+          scrollTrigger: {
+            trigger: 'footer',
+            start: 'top bottom',
+            end: 'bottom bottom',
+            scrub: true
+          }
+        }
+      );
+    }
+
+    /* 10. BACKGROUND FLOATING PARTICLES (Dust Motes Engine) */
+    function initParticleAtmosphere() {
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+      
+      const particleCount = 45;
+      const particles = [];
+      
+      class Mote {
+        constructor() {
+          this.reset();
+          this.y = Math.random() * height; // Distribute globally initially
+        }
+        reset() {
+          this.x = Math.random() * width;
+          this.y = height + 10;
+          this.size = Math.random() * 1.5 + 0.5;
+          this.speedY = -(Math.random() * 0.4 + 0.1);
+          this.speedX = Math.sin(Math.random() * 2) * 0.2;
+          this.opacity = Math.random() * 0.5 + 0.1;
+        }
+        update() {
+          this.y += this.speedY;
+          this.x += this.speedX;
+          if (this.y < -10) this.reset();
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(245, 242, 235, ${this.opacity})`;
+          ctx.fill();
+        }
+      }
+      
+      for(let i=0; i < particleCount; i++) {
+        particles.push(new Mote());
+      }
+      
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach(mote => {
+          mote.update();
+          mote.draw();
+        });
+        requestAnimationFrame(animate);
+      }
+      
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+      
+      animate();
+    }
+  </script>
+</body>
+</html>
